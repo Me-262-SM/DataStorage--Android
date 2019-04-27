@@ -3,6 +3,7 @@ package com.edu.sicnu.cs.zzy.datastorage;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -69,12 +70,30 @@ public class DataBaseActivity extends AppCompatActivity {
     //查
     public void retrieve(View v){
         String name = et_name.getText().toString();
-        Cursor cursor = db.query(MySQLiteHepler.tableName, null, "name like ?", new String[]{"%"+name+"%"}, null, null, null, null);
-        adapter.swapCursor(cursor);
+        //Cursor cursor = db.query(MySQLiteHepler.tableName, null, "name like ?", new String[]{"%"+name+"%"}, null, null, null, null);
+        //adapter.swapCursor(cursor);
+        new MyAsyncTask().execute(new String[]{"%"+name+"%"});
+
+
     }
 
     private void reload() {
         Cursor cursor = db.query(MySQLiteHepler.tableName, null, null, null, null, null, null, null);
         adapter.swapCursor(cursor);
+    }
+
+    class MyAsyncTask extends AsyncTask<String,Integer,Cursor>{
+
+        @Override
+        protected Cursor doInBackground(String... strings) {
+            Cursor cursor = db.query(MySQLiteHepler.tableName, null, "name like ?",strings, null, null, null, null);
+            return cursor;
+        }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            super.onPostExecute(cursor);
+            adapter.swapCursor(cursor);
+        }
     }
 }
